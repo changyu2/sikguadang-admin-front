@@ -30,8 +30,91 @@ const Cover = styled.div`
 `;
 
 const ContentList = props => {
+  function storeCategorySwitch(categoryNumber) {
+    switch (categoryNumber) {
+      case 1:
+        return '체험식';
+      case 2:
+        return '반찬';
+      case 3:
+        return '간식';
+      default:
+        return null;
+    }
+  }
+
   function renderSwitch(contentName) {
     switch (contentName) {
+      case 'Store':
+        return (
+          <>
+            {props.storeItemList.length ? (
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>
+                      <h2>제작</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>상품명</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>가격</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>할인가격</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>카테고리</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>상태</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>스케쥴날짜</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>제작날짜</h2>
+                    </TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.storeItemList.map((storeItem, index) => (
+                    <tr
+                      key={storeItem.storeItemId}
+                      onClick={() => {
+                        props.openStoreItem(storeItem.storeItemId);
+                      }}
+                    >
+                      <TableData>{storeItem.author.authorName}</TableData>
+                      <TableData>{storeItem.title}</TableData>
+                      <TableData>{storeItem.price}</TableData>
+                      <TableData>{storeItem.discountPrice}</TableData>
+                      <TableData>
+                        {storeCategorySwitch(storeItem.category)}
+                      </TableData>
+                      <TableData>{storeItem.status}</TableData>
+                      <TableData>
+                        {moment(storeItem.sdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                      <TableData>
+                        {moment(storeItem.cdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <Cover>
+                <h2>스토어 아이템이 없습니다.</h2>
+              </Cover>
+            )}
+          </>
+        );
       case 'Jipijigi':
         return (
           <>
@@ -87,7 +170,7 @@ const ContentList = props => {
               </Table>
             ) : (
               <Cover>
-                <h2>게시물이 없습니다.</h2>
+                <h2>게시글이 없습니다.</h2>
               </Cover>
             )}
           </>

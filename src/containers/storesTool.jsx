@@ -17,86 +17,98 @@ import {
   DialogItem
 } from '../components';
 import {
-  getJipijigiList,
-  postJipijigi,
-  editJipijigi
-} from '../actions/jipijigi';
+  getStoreItemList,
+  postStoreItem,
+  editStoreItem
+} from '../actions/stores';
 import { postTempImages } from '../actions/images';
 import config from '../utils/config';
 
-const initialJipijigi = {
-  jipijigiId: '',
+const initialStoreItem = {
+  storeItemId: '',
   title: '',
   description: '',
   thumbnailUrl: [],
-  imageUrl: [],
-  category: '',
+  price: '',
+  discountPrice: '',
+  optionItem1Name: '',
+  optionItem1Price: '',
+  optionItem2Name: '',
+  optionItem2Price: '',
+  optionItem3Name: '',
+  optionItem3Price: '',
+  optionItem4Name: '',
+  optionItem4Price: '',
+  category: null,
+  soldOut: null,
+  limited: null,
+  hot: null,
+  new: null,
   status: '',
   sdate: null,
-  cdate: null
+  cdate: null,
+  productDetailCards: []
 };
 
-const JipijigiTool = props => {
+const StoresTool = props => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [jipijigiId, setJipijigiId] = useState('');
-  const [jipijigi, setJipijigi] = useState({ ...initialJipijigi });
+  const [storeItemId, setStoreItemId] = useState('');
+  const [storeItem, setStoreItem] = useState({ ...initialStoreItem });
   const [page, setPage] = useState(0);
 
-  const sdate = jipijigi.sdate
-    ? moment(jipijigi.sdate)
+  const sdate = storeItem.sdate
+    ? moment(storeItem.sdate)
         .utcOffset(9)
         .toDate()
     : null;
 
   useEffect(() => {
-    props.getJipijigiList();
+    props.getStoreItemList();
   }, []);
 
-  const handleOpenNewJipijigi = () => {
+  const handleOpenNewStoreItem = () => {
     setModalVisible(true);
-    setJipijigi({ ...initialJipijigi });
+    setStoreItem({ ...initialStoreItem });
   };
 
-  const handleOpenJipijigi = jipijiId => {
-    if (jipijiId) {
-      let jipijigi = props.jipijigiList.filter(
-        jipijigi => jipijigi.jipijigiId === jipijigiId
+  const handleOpenStoreItem = storeItemId => {
+    if (storeItemId) {
+      let storeItem = props.storeItemList.filter(
+        storeItem => storeItem.storeItemId === storeItemId
       )[0];
       setModalVisible(true);
-      setJipijigi(jipijigi);
-      setJipijigiId(jipijiId);
-    } else {
-      setModalVisible(true);
+      setStoreItem(storeItem);
+      setStoreItemId(storeItemId);
     }
   };
 
   const handleDeleteThumbnailImage = index => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         thumbnailUrl: { $splice: [[index, 1]] }
       })
     );
   };
 
-  const handleDeleteCard = index => {
-    setJipijigi(
-      update(jipijigi, {
-        imageUrl: { $splice: [[index, 1]] }
+  const handleDeleteProductDetailCard = index => {
+    setStoreItem(
+      update(storeItem, {
+        productDetailCards: { $splice: [[index, 1]] }
       })
     );
   };
 
   const handleChangeTitle = e => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         title: { $set: e.target.value }
       })
     );
   };
 
   const handleChangeDescription = e => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         description: { $set: e.target.value }
       })
     );
@@ -153,8 +165,8 @@ const JipijigiTool = props => {
                 newCard.localImageUrl = files[i].preview;
                 newCardArray.push(newCard);
               }
-              setJipijigi(
-                update(jipijigi, {
+              setStoreItem(
+                update(storeItem, {
                   thumbnailUrl: { $push: newCardArray }
                 })
               );
@@ -169,7 +181,7 @@ const JipijigiTool = props => {
     }
   };
 
-  const handleDropImagesToImageUrl = (files, type) => {
+  const handleDropImagesToProductDetailCards = (files, type) => {
     if (files.length > 0) {
       files.sort(function(a, b) {
         return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
@@ -220,9 +232,9 @@ const JipijigiTool = props => {
                 newCard.localImageUrl = files[i].preview;
                 newCardArray.push(newCard);
               }
-              setJipijigi(
-                update(jipijigi, {
-                  imageUrl: { $push: newCardArray }
+              setStoreItem(
+                update(storeItem, {
+                  productDetailCards: { $push: newCardArray }
                 })
               );
             }
@@ -236,24 +248,136 @@ const JipijigiTool = props => {
     }
   };
 
+  const handleChangePrice = e => {
+    setStoreItem(
+      update(storeItem, {
+        price: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeDiscountPrice = e => {
+    setStoreItem(
+      update(storeItem, {
+        discountPrice: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem1Name = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem1Name: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem1Price = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem1Price: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem2Name = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem2Name: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem2Price = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem2Price: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem3Name = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem3Name: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem3Price = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem3Price: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem4Name = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem4Name: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeOptionItem4Price = e => {
+    setStoreItem(
+      update(storeItem, {
+        optionItem4Price: { $set: e.target.value }
+      })
+    );
+  };
+
   const handleChangeCategory = (e, index, value) => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         category: { $set: value }
       })
     );
   };
 
+  const handleChangeSoldOut = (e, index, value) => {
+    setStoreItem(
+      update(storeItem, {
+        soldOut: { $set: value }
+      })
+    );
+  };
+
+  const handleChangeLimited = (e, index, value) => {
+    setStoreItem(
+      update(storeItem, {
+        limited: { $set: value }
+      })
+    );
+  };
+
+  const handleChangeHot = (e, index, value) => {
+    setStoreItem(
+      update(storeItem, {
+        hot: { $set: value }
+      })
+    );
+  };
+
+  const handleChangeNew = (e, index, value) => {
+    setStoreItem(
+      update(storeItem, {
+        new: { $set: value }
+      })
+    );
+  };
+
   const handleChangeStatus = (e, index, value) => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         status: { $set: value }
       })
     );
   };
 
   const handleChangeScheduleDate = (waste, scheduledDate) => {
-    let oldDate = jipijigi.sdate;
+    let oldDate = storeItem.sdate;
     if (oldDate) {
       let hours = moment(oldDate).hours();
       let minutes = moment(oldDate).minutes();
@@ -261,15 +385,15 @@ const JipijigiTool = props => {
         .hours(hours)
         .minutes(minutes);
     }
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         sdate: { $set: scheduledDate }
       })
     );
   };
 
   const handleChangeScheduleTime = (waste, scheduledDate) => {
-    let oldDate = jipijigi.sdate;
+    let oldDate = storeItem.sdate;
     if (oldDate) {
       let hours = moment(scheduledDate).hours();
       let minutes = moment(scheduledDate).minutes();
@@ -277,8 +401,8 @@ const JipijigiTool = props => {
         .hours(hours)
         .minutes(minutes);
     }
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         sdate: { $set: scheduledDate }
       })
     );
@@ -286,39 +410,69 @@ const JipijigiTool = props => {
 
   const handleOk = () => {
     const data = {};
-    data.jipijigi = jipijigi;
+    data.storeItem = storeItem;
 
-    if (!jipijigi.title) {
-      alert('제목을 입력해주세요.');
+    if (!storeItem.title) {
+      alert('상품명을 입력해주세요.');
       return false;
     }
 
-    if (jipijigi.thumbnailUrl.length === 0) {
+    if (storeItem.thumbnailUrl.length === 0) {
       alert('썸네일 이미지를 업로드해주세요.');
       return false;
     }
 
-    if (!jipijigi.category) {
+    if (!storeItem.price) {
+      alert('가격을 입력해주세요.');
+      return false;
+    }
+
+    if (!storeItem.category) {
       alert('카테고리를 선택해주세요.');
       return false;
     }
 
-    if (!jipijigi.status) {
+    if (storeItem.soldOut === null) {
+      alert('품절 여부를 선택해주세요.');
+      return false;
+    }
+
+    if (storeItem.limited === null) {
+      alert('기간 한정 상품 여부를 선택해주세요.');
+      return false;
+    }
+
+    if (storeItem.hot === null) {
+      alert('인기 상품 여부를 선택해주세요.');
+      return false;
+    }
+
+    if (storeItem.new === null) {
+      alert('신상품 여부를 선택해주세요.');
+      return false;
+    }
+
+    if (!storeItem.status) {
       alert('상태를 선택해주세요.');
       return false;
     }
 
-    if (!jipijigi.sdate) {
+    if (!storeItem.sdate) {
       alert('스케쥴 날짜를 선택해주세요.');
+      return false;
+    }
+
+    if (storeItem.productDetailCards.length === 0) {
+      alert('상품 세부 이미지를 업로드 해주세요.');
       return false;
     }
 
     if (true) {
       return new Promise((resolve, reject) => {
-        if (jipijigiId) {
-          return resolve(props.editJipijigi(jipijigiId, data));
+        if (storeItemId) {
+          return resolve(props.editStoreItem(storeItemId, data));
         } else {
-          return resolve(props.postJipijigi(data));
+          return resolve(props.postStoreItem(data));
         }
       })
         .then(response => {
@@ -336,8 +490,8 @@ const JipijigiTool = props => {
     const check = confirm('작성을 취소하시겠어요?');
     if (check) {
       setModalVisible(false);
-      setJipijigi({ ...initialJipijigi });
-      setJipijigiId('');
+      setStoreItem({ ...initialStoreItem });
+      setStoreItemId('');
     }
   };
 
@@ -354,20 +508,20 @@ const JipijigiTool = props => {
   };
 
   const onSortEndForThumbnailUrl = ({ oldIndex, newIndex }) => {
-    setJipijigi(
-      update(jipijigi, {
+    setStoreItem(
+      update(storeItem, {
         thumbnailUrl: {
-          $set: arrayMove(jipijigi.thumbnailUrl, oldIndex, newIndex)
+          $set: arrayMove(storeItem.thumbnailUrl, oldIndex, newIndex)
         }
       })
     );
   };
 
-  const onSortEndForImageUrl = ({ oldIndex, newIndex }) => {
-    setJipijigi(
-      update(jipijigi, {
-        imageUrl: {
-          $set: arrayMove(jipijigi.imageUrl, oldIndex, newIndex)
+  const onSortEndForProductDetailCards = ({ oldIndex, newIndex }) => {
+    setStoreItem(
+      update(storeItem, {
+        productDetailCards: {
+          $set: arrayMove(storeItem.productDetailCards, oldIndex, newIndex)
         }
       })
     );
@@ -380,15 +534,15 @@ const JipijigiTool = props => {
         <Grid style={{ width: '100%', padding: '0px' }}>
           <Row>
             <Col xs={12}>
-              <Button onClick={handleOpenNewJipijigi}>New Article</Button>
+              <Button onClick={handleOpenNewStoreItem}>New StoreItem</Button>
             </Col>
           </Row>
           <Row style={{ margin: '20px 0px' }}>
             <Col xs={12} style={{ padding: '0px' }}>
               <ContentList
-                contentName="Jipijigi"
-                jipijigiList={props.jipijigiList}
-                openJipijigi={handleOpenJipijigi}
+                contentName="Store"
+                storeItemList={props.storeItemList}
+                openStoreItem={handleOpenStoreItem}
               />
             </Col>
           </Row>
@@ -413,20 +567,35 @@ const JipijigiTool = props => {
         ]}
       >
         <DialogItem
-          dialogName="Jipijigi"
-          jipijigi={jipijigi}
+          dialogName="Store"
+          storeItem={storeItem}
           changeTitle={handleChangeTitle}
           changeDescription={handleChangeDescription}
           dropImagesToThumbnail={handleDropImagesToThumbnail}
           onSortEndForThumbnailUrl={onSortEndForThumbnailUrl}
           deleteThumbnailImage={handleDeleteThumbnailImage}
-          dropImagesToImageUrl={handleDropImagesToImageUrl}
-          onSortEndForImageUrl={onSortEndForImageUrl}
+          changePrice={handleChangePrice}
+          changeDiscountPrice={handleChangeDiscountPrice}
+          changeOptionItem1Name={handleChangeOptionItem1Name}
+          changeOptionItem1Price={handleChangeOptionItem1Price}
+          changeOptionItem2Name={handleChangeOptionItem2Name}
+          changeOptionItem2Price={handleChangeOptionItem2Price}
+          changeOptionItem3Name={handleChangeOptionItem3Name}
+          changeOptionItem3Price={handleChangeOptionItem3Price}
+          changeOptionItem4Name={handleChangeOptionItem4Name}
+          changeOptionItem4Price={handleChangeOptionItem4Price}
           changeCategory={handleChangeCategory}
+          changeSoldOut={handleChangeSoldOut}
+          changeLimited={handleChangeLimited}
+          changeHot={handleChangeHot}
+          changeNew={handleChangeNew}
           changeStatus={handleChangeStatus}
           sdate={sdate}
           changeScheduleDate={handleChangeScheduleDate}
           changeScheduleTime={handleChangeScheduleTime}
+          dropImagesToProductDetailCards={handleDropImagesToProductDetailCards}
+          onSortEndForProductDetailCards={onSortEndForProductDetailCards}
+          deleteProductDetailCard={handleDeleteProductDetailCard}
         />
       </Dialog>
     </>
@@ -435,22 +604,22 @@ const JipijigiTool = props => {
 
 const mapStateToProps = state => {
   return {
-    jipijigiList: state.jipijigi.jipijigiList,
-    getJipijigiListStatus: state.jipijigi.jipijigiList,
+    storeItemList: state.stores.storeItemList,
+    getStoreListStatus: state.stores.storeItemList,
     postTempImagesStatus: state.images.postTempImages
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    getJipijigiList: (offset, limit) => {
-      return dispatch(getJipijigiList(offset, limit));
+    getStoreItemList: (offset, limit) => {
+      return dispatch(getStoreItemList(offset, limit));
     },
-    postJipijigi: data => {
-      return dispatch(postJipijigi(data));
+    postStoreItem: data => {
+      return dispatch(postStoreItem(data));
     },
-    editJipijigi: (jipijigiId, data) => {
-      return dispatch(editJipijigi(jipijigiId, data));
+    editStoreItem: (storeItemId, data) => {
+      return dispatch(editStoreItem(storeItemId, data));
     },
     postTempImages: data => {
       return dispatch(postTempImages(data));
@@ -462,5 +631,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(JipijigiTool)
+  )(StoresTool)
 );
