@@ -19,6 +19,7 @@ const StyledLink = styled(Link)`
   font-weight: bold;
   margin-bottom: 50px;
   display: block;
+  outline: none;
 `;
 
 class Sidebar extends Component {
@@ -68,6 +69,7 @@ class Sidebar extends Component {
           onStateChange={this.onMenuToggle}
         >
           <StyledLink to="/stores">건강당 마켓 관리</StyledLink>
+          <StyledLink to="/jipijigi">지피지기 당뇨 관리</StyledLink>
           <Logout onClick={this.goHome}>LOGOUT</Logout>
         </Menu>
       </>
