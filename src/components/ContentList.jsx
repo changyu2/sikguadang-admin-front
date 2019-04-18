@@ -45,6 +45,62 @@ const ContentList = props => {
 
   function renderSwitch(contentName) {
     switch (contentName) {
+      case 'Notice':
+        return (
+          <>
+            {props.noticeList.length ? (
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>
+                      <h2>제작</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>제목</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>유형</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>스케쥴날짜</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>제작날짜</h2>
+                    </TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.noticeList.map((notice, index) => (
+                    <tr
+                      key={notice.noticeId}
+                      onClick={() => {
+                        props.openNotice(notice.noticeId);
+                      }}
+                    >
+                      <TableData>{notice.author.authorName}</TableData>
+                      <TableData>{notice.title}</TableData>
+                      <TableData>{notice.status}</TableData>
+                      <TableData>
+                        {moment(notice.sdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                      <TableData>
+                        {moment(notice.cdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <Cover>
+                <h2>공지사항이 없습니다.</h2>
+              </Cover>
+            )}
+          </>
+        );
       case 'Store':
         return (
           <>

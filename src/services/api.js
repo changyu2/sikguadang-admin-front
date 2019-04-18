@@ -13,6 +13,30 @@ export const login = (email, password) => {
   });
 };
 
+export const getNoticeList = (offset, limit) => {
+  return request({
+    url: `/v1/notices?offset=${offset}&limit=${limit}`,
+    method: 'GET',
+    data: {}
+  });
+};
+
+export const postNotice = data => {
+  return request({
+    url: '/v1/notices',
+    method: 'POST',
+    data: data
+  });
+};
+
+export const editNotice = (noticeId, data) => {
+  return request({
+    url: `/v1/notices/${noticeId}`,
+    method: 'PUT',
+    data: data
+  });
+};
+
 export const getStoreItemList = (offset, limit) => {
   return request({
     url: `/v1/stores?offset=${offset}&limit=${limit}`,

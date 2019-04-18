@@ -68,6 +68,7 @@ class Sidebar extends Component {
           isOpen={this.state.isMenuOpen}
           onStateChange={this.onMenuToggle}
         >
+          <StyledLink to="/notices">공지사항 관리</StyledLink>
           <StyledLink to="/stores">건강당 마켓 관리</StyledLink>
           <StyledLink to="/jipijigi">지피지기 당뇨 관리</StyledLink>
           <Logout onClick={this.goHome}>LOGOUT</Logout>

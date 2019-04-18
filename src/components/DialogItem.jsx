@@ -56,6 +56,91 @@ const SortableList = SortableContainer(({ cards, handleDeleteCard }) => {
 const DialogItem = props => {
   function renderSwitch(dialogName) {
     switch (dialogName) {
+      case 'Notice':
+        return (
+          <Row>
+            <Col xs={12}>
+              <TextField
+                floatingLabelText="제목"
+                floatingLabelFixed={true}
+                defaultValue={props.notice.title}
+                onChange={props.changeTitle}
+                style={styles.col}
+              />
+              <TextField
+                floatingLabelText="내용"
+                floatingLabelFixed={true}
+                defaultValue={props.notice.text}
+                onChange={props.changeText}
+                multiLine={true}
+                style={styles.col}
+              />
+              <Row>
+                <Dropzone
+                  onDrop={files => props.dropImagesToImageUrl(files)}
+                  style={styles.cardSlideContainer}
+                  accept="image/*"
+                  disableClick={true}
+                >
+                  <div>공지사항 이미지</div>
+                  <Row>
+                    <SortableList
+                      axis={'xy'}
+                      cards={props.notice.imageUrl}
+                      onSortEnd={props.onSortEndForImageUrl}
+                      handleDeleteCard={props.deleteCard}
+                      useDragHandle={false}
+                    />
+                    <Col xs={4}>
+                      <Dropzone
+                        onDrop={files => props.dropImagesToImageUrl(files)}
+                        accept="image/*"
+                        style={{ border: 'none' }}
+                      >
+                        <Paper style={styles.card}>
+                          <div
+                            style={{
+                              height: 150,
+                              textAlign: 'center',
+                              transform: 'translateY(40%)'
+                            }}
+                          >
+                            이미지 추가
+                          </div>
+                        </Paper>
+                      </Dropzone>
+                    </Col>
+                  </Row>
+                </Dropzone>
+              </Row>
+              <SelectField
+                floatingLabelText="상태"
+                value={props.notice.status}
+                onChange={props.changeStatus}
+                style={styles.col}
+              >
+                <MenuItem value={'actv'} primaryText="active" />
+                <MenuItem value={'del'} primaryText="delete" />
+              </SelectField>
+              <DatePicker
+                floatingLabelText="스케쥴 날짜"
+                hintText="DATE"
+                value={props.sdate}
+                onChange={props.changeScheduleDate}
+                style={styles.dateAndTimePicker}
+                textFieldStyle={styles.col}
+              />
+              <TimePicker
+                floatingLabelText="스케쥴 시간"
+                hintText="TIME"
+                value={props.sdate}
+                onChange={props.changeScheduleTime}
+                style={styles.dateAndTimePicker}
+                textFieldStyle={styles.col}
+              />
+            </Col>
+          </Row>
+        );
       case 'Store':
         return (
           <Row>
