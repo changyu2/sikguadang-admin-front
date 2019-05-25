@@ -47,7 +47,7 @@ const LoginButton = styled.button`
 `;
 
 const Login = props => {
-  const [email, setEmail] = useState('');
+  const [authorId, setAuthorId] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
@@ -55,8 +55,8 @@ const Login = props => {
     localStorage.removeItem('sar');
   }, []);
 
-  const handleChangeEmail = e => {
-    setEmail(e.target.value);
+  const handleChangeAuthorId = e => {
+    setAuthorId(e.target.value);
   };
 
   const handleChangePassword = e => {
@@ -64,8 +64,8 @@ const Login = props => {
   };
 
   const handleLogin = () => {
-    if (!email) {
-      alert('이메일을 입력해주세요.');
+    if (!authorId) {
+      alert('아이디를 입력해주세요.');
       return false;
     }
 
@@ -79,11 +79,13 @@ const Login = props => {
       shaobj.update(password);
       const hashPW = shaobj.getHash('HEX');
       props
-        .login(email, hashPW)
+        .login(authorId, hashPW)
         .then(() => {
           props.history.push('/stores');
         })
-        .catch(err => {});
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 
@@ -97,9 +99,9 @@ const Login = props => {
     <LoginContainer>
       <TextField
         name="email"
-        hintText="Email"
-        floatingLabelText="Email"
-        onChange={handleChangeEmail}
+        hintText="AuthorId"
+        floatingLabelText="AuthorId"
+        onChange={handleChangeAuthorId}
         style={{ width: '100%' }}
       />
       <TextField
@@ -124,8 +126,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    login: (email, password) => {
-      return dispatch(login(email, password, '/'));
+    login: (authorId, password) => {
+      return dispatch(login(authorId, password, '/'));
     }
   };
 };

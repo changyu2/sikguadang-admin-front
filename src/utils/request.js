@@ -5,7 +5,7 @@ Returns a Axios Request Promise
 export default function request({ url, method = 'get', data }) {
   let config = {
     headers: {
-      'x-s12-admin-token': localStorage.sat,
+      'x-sikguadang-admin-token': localStorage.sat,
       'Cache-Control': 'no-cache'
     }
   };

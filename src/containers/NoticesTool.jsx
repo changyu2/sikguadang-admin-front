@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import update from 'immutability-helper';
 import Promise from 'bluebird';
+import { arrayMove } from 'react-sortable-hoc';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import moment from 'moment';
 import { Dialog, FlatButton } from 'material-ui';
@@ -17,12 +18,13 @@ import {
 } from '../components';
 import { postTempImages } from '../actions/images';
 import { getNoticeList, postNotice, editNotice } from '../actions/notices';
+import config from '../utils/config';
 
 const initialNotice = {
   noticeId: '',
   title: '',
   text: '',
-  imageUrl: [],
+  imageCards: [],
   status: '',
   sdate: null,
   cdate: null
@@ -65,7 +67,7 @@ const NoticesTool = props => {
   const handleDeleteCard = index => {
     setNotice(
       update(notice, {
-        imageUrl: { $splice: [[index, 1]] }
+        imageCards: { $splice: [[index, 1]] }
       })
     );
   };
@@ -86,7 +88,7 @@ const NoticesTool = props => {
     );
   };
 
-  const handleDropImagesToImageUrl = (files, type) => {
+  const handleDropImagesToImageCards = (files, type) => {
     if (files.length > 0) {
       files.sort(function(a, b) {
         return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
@@ -139,7 +141,7 @@ const NoticesTool = props => {
               }
               setNotice(
                 update(notice, {
-                  imageUrl: { $push: newCardArray }
+                  imageCards: { $push: newCardArray }
                 })
               );
             }
@@ -161,34 +163,34 @@ const NoticesTool = props => {
     );
   };
 
-  const handleChangeScheduleDate = (waste, createdDate) => {
+  const handleChangeScheduleDate = (waste, scheduledDate) => {
     let oldDate = notice.sdate;
     if (oldDate) {
       let hours = moment(oldDate).hours();
       let minutes = moment(oldDate).minutes();
-      createdDate = moment(createdDate)
+      scheduledDate = moment(scheduledDate)
         .hours(hours)
         .minutes(minutes);
     }
     setNotice(
       update(notice, {
-        sdate: { $set: createdDate }
+        sdate: { $set: scheduledDate }
       })
     );
   };
 
-  const handleChangeScheduleTime = (waste, createdDate) => {
+  const handleChangeScheduleTime = (waste, scheduledDate) => {
     let oldDate = notice.sdate;
     if (oldDate) {
-      let hours = moment(oldDate).hours();
-      let minutes = moment(oldDate).minutes();
-      createdDate = moment(createdDate)
+      let hours = moment(scheduledDate).hours();
+      let minutes = moment(scheduledDate).minutes();
+      scheduledDate = moment(oldDate)
         .hours(hours)
         .minutes(minutes);
     }
     setNotice(
       update(notice, {
-        sdate: { $set: createdDate }
+        sdate: { $set: scheduledDate }
       })
     );
   };
@@ -226,7 +228,6 @@ const NoticesTool = props => {
         }
       })
         .then(response => {
-          console.log(response);
           window.location.reload();
         })
         .catch(err => {
@@ -245,11 +246,23 @@ const NoticesTool = props => {
     }
   };
 
-  const onSortEndForImageUrl = ({ oldIndex, newIndex }) => {
+  const getImageUrl = (url, localUrl) => {
+    let imageUrl;
+    if (url && url !== null) {
+      if (!url.startsWith('temp')) {
+        imageUrl = config.get('cdn') + url;
+      } else if (localUrl) {
+        imageUrl = localUrl;
+      }
+    }
+    return imageUrl;
+  };
+
+  const onSortEndForImageCards = ({ oldIndex, newIndex }) => {
     setNotice(
       update(notice, {
-        imageUrl: {
-          $set: arrayMove(notice.imageUrl, oldIndex, newIndex)
+        imageCards: {
+          $set: arrayMove(notice.imageCards, oldIndex, newIndex)
         }
       })
     );
@@ -299,8 +312,9 @@ const NoticesTool = props => {
           notice={notice}
           changeTitle={handleChangeTitle}
           changeText={handleChangeText}
-          dropImagesToImageUrl={handleDropImagesToImageUrl}
-          onSortEndForImageUrl={onSortEndForImageUrl}
+          dropImagesToImageCards={handleDropImagesToImageCards}
+          onSortEndForImageCards={onSortEndForImageCards}
+          deleteImageCards={handleDeleteCard}
           changeStatus={handleChangeStatus}
           sdate={sdate}
           changeScheduleDate={handleChangeScheduleDate}

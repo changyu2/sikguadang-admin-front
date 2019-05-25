@@ -39,6 +39,8 @@ const initialStoreItem = {
   optionItem3Price: '',
   optionItem4Name: '',
   optionItem4Price: '',
+  weight: '',
+  expirationDate: '',
   category: null,
   soldOut: null,
   limited: null,
@@ -47,7 +49,8 @@ const initialStoreItem = {
   status: '',
   sdate: null,
   cdate: null,
-  productDetailCards: []
+  productDetailCards: [],
+  productInfoCards: []
 };
 
 const StoresTool = props => {
@@ -94,6 +97,14 @@ const StoresTool = props => {
     setStoreItem(
       update(storeItem, {
         productDetailCards: { $splice: [[index, 1]] }
+      })
+    );
+  };
+
+  const handleDeleteProductInfoCard = index => {
+    setStoreItem(
+      update(storeItem, {
+        productInfoCards: { $splice: [[index, 1]] }
       })
     );
   };
@@ -248,6 +259,73 @@ const StoresTool = props => {
     }
   };
 
+  const handleDropImagesToProductInfoCards = (files, type) => {
+    if (files.length > 0) {
+      files.sort(function(a, b) {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+      });
+      const imageSizePromiseArray = [];
+      const data = new FormData();
+
+      files.forEach(file => {
+        const imageSizePromise = new Promise((resolve, reject) => {
+          const image = new Image();
+          image.src = file.preview;
+          image.onload = function() {
+            if (this.width === this.height && this.width <= 1600) {
+              return resolve();
+            } else if (this.width > this.height && this.width <= 1600) {
+              return resolve();
+            } else if (this.width < this.height && this.width <= 1600) {
+              return resolve();
+            } else {
+              const err = new Error(
+                file.name +
+                  '\n이미지의 해상도는 작은 각이 1600 픽셀 이하로 준비해주세요.'
+              );
+              alert(
+                '이미지의 해상도는 작은 각이 1600 픽셀 이하로 준비해주세요.'
+              );
+              return reject(err);
+            }
+          };
+        });
+        imageSizePromiseArray.push(imageSizePromise);
+        data.append('images', file);
+      });
+      return new Promise.all(imageSizePromiseArray).then(() => {
+        props
+          .postTempImages(data)
+          .then(response => {
+            const tempKeyArray = response.value.data;
+            if (tempKeyArray.length !== files.length) {
+              alert(
+                'Number of temp images returned, and uploaded are different'
+              );
+            } else {
+              const newCardArray = [];
+              for (let i in tempKeyArray) {
+                const newCard = {};
+                newCard.imageUrl = tempKeyArray[i];
+                newCard.localImageUrl = files[i].preview;
+                newCardArray.push(newCard);
+              }
+              setStoreItem(
+                update(storeItem, {
+                  productInfoCards: { $push: newCardArray }
+                })
+              );
+            }
+          })
+          .catch(err => {
+            alert('10MB 이하의 이미지를 업로드 해주세요.');
+          });
+      });
+    } else {
+      alert('이미지를 업로드 해주세요.');
+    }
+  };
+
   const handleChangePrice = e => {
     setStoreItem(
       update(storeItem, {
@@ -324,6 +402,22 @@ const StoresTool = props => {
     setStoreItem(
       update(storeItem, {
         optionItem4Price: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeWeight = e => {
+    setStoreItem(
+      update(storeItem, {
+        weight: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeExpirationDate = e => {
+    setStoreItem(
+      update(storeItem, {
+        expirationDate: { $set: e.target.value }
       })
     );
   };
@@ -427,6 +521,16 @@ const StoresTool = props => {
       return false;
     }
 
+    if (!storeItem.weight) {
+      alert('중량 정보를 입력해주세요.');
+      return false;
+    }
+
+    if (!storeItem.expirationDate) {
+      alert('유통기한 정보를 입력해주세요.');
+      return false;
+    }
+
     if (!storeItem.category) {
       alert('카테고리를 선택해주세요.');
       return false;
@@ -464,6 +568,11 @@ const StoresTool = props => {
 
     if (storeItem.productDetailCards.length === 0) {
       alert('상품 세부 이미지를 업로드 해주세요.');
+      return false;
+    }
+
+    if (storeItem.productInfoCards.length === 0) {
+      alert('제품정보고시 이미지를 업로드 해주세요.');
       return false;
     }
 
@@ -527,6 +636,16 @@ const StoresTool = props => {
     );
   };
 
+  const onSortEndForProductInfoCards = ({ oldIndex, newIndex }) => {
+    setStoreItem(
+      update(storeItem, {
+        productInfoCards: {
+          $set: arrayMove(storeItem.productInfoCards, oldIndex, newIndex)
+        }
+      })
+    );
+  };
+
   return (
     <>
       <Topbar title="식과당 관리자 페이지" toggleMenu={props.toggleMenu} />
@@ -584,6 +703,8 @@ const StoresTool = props => {
           changeOptionItem3Price={handleChangeOptionItem3Price}
           changeOptionItem4Name={handleChangeOptionItem4Name}
           changeOptionItem4Price={handleChangeOptionItem4Price}
+          changeWeight={handleChangeWeight}
+          changeExpirationDate={handleChangeExpirationDate}
           changeCategory={handleChangeCategory}
           changeSoldOut={handleChangeSoldOut}
           changeLimited={handleChangeLimited}
@@ -596,6 +717,9 @@ const StoresTool = props => {
           dropImagesToProductDetailCards={handleDropImagesToProductDetailCards}
           onSortEndForProductDetailCards={onSortEndForProductDetailCards}
           deleteProductDetailCard={handleDeleteProductDetailCard}
+          dropImagesToProductInfoCards={handleDropImagesToProductInfoCards}
+          onSortEndForProductInfoCards={onSortEndForProductInfoCards}
+          deleteProductInfoCard={handleDeleteProductInfoCard}
         />
       </Dialog>
     </>

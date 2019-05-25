@@ -1,6 +1,13 @@
 import types from './actionTypes/auth';
 import * as api from '../services/api';
 
+export const me = () => ({
+  type: types.ME,
+  payload: {
+    promise: api.me()
+  }
+});
+
 export const login = (email, password) => ({
   type: types.LOGIN,
   payload: {

@@ -1,4 +1,5 @@
 const auth = {
+  ME: 'ME',
   LOGIN: 'LOGIN'
 };
 

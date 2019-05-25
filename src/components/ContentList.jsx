@@ -33,11 +33,24 @@ const ContentList = props => {
   function storeCategorySwitch(categoryNumber) {
     switch (categoryNumber) {
       case 1:
-        return '체험식';
-      case 2:
         return '반찬';
-      case 3:
+      case 2:
         return '간식';
+      case 3:
+        return '영양제';
+      default:
+        return null;
+    }
+  }
+
+  function articleCategorySwitch(categoryNumber) {
+    switch (categoryNumber) {
+      case 1:
+        return '당뇨란?';
+      case 2:
+        return '당뇨 음식';
+      case 3:
+        return '당뇨 운동';
       default:
         return null;
     }
@@ -89,6 +102,56 @@ const ContentList = props => {
                         {moment(notice.cdate)
                           .utcOffset(9)
                           .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <Cover>
+                <h2>공지사항이 없습니다.</h2>
+              </Cover>
+            )}
+          </>
+        );
+      case 'Inquiry':
+        return (
+          <>
+            {props.inquiryList.length ? (
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>
+                      <h2>제목</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>작성날짜</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>답변날짜</h2>
+                    </TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.inquiryList.map((inquiry, index) => (
+                    <tr
+                      key={inquiry.inquiryId}
+                      onClick={() => {
+                        props.openInquiry(inquiry.inquiryId);
+                      }}
+                    >
+                      <TableData>{inquiry.title}</TableData>
+                      <TableData>
+                        {moment(inquiry.cdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                      <TableData>
+                        {inquiry.answer
+                          ? moment(inquiry.answer.answerDate)
+                              .utcOffset(9)
+                              .format('YY.MM.DD HH:mm')
+                          : null}
                       </TableData>
                     </tr>
                   ))}
@@ -171,10 +234,10 @@ const ContentList = props => {
             )}
           </>
         );
-      case 'Jipijigi':
+      case 'Article':
         return (
           <>
-            {props.jipijigiList.length ? (
+            {props.articleList.length ? (
               <Table>
                 <thead>
                   <tr>
@@ -199,24 +262,26 @@ const ContentList = props => {
                   </tr>
                 </thead>
                 <tbody>
-                  {props.jipijigiList.map((jipijigi, index) => (
+                  {props.articleList.map((article, index) => (
                     <tr
-                      key={jipijigi.jipijigiId}
+                      key={article.articleId}
                       onClick={() => {
-                        props.openJipijigi(jipijigi.jipijigiId);
+                        props.openArticle(article.articleId);
                       }}
                     >
-                      <TableData>{jipijigi.author.authorName}</TableData>
-                      <TableData>{jipijigi.title}</TableData>
-                      <TableData>{jipijigi.category}</TableData>
-                      <TableData>{jipijigi.status}</TableData>
+                      <TableData>{article.author.authorName}</TableData>
+                      <TableData>{article.title}</TableData>
                       <TableData>
-                        {moment(jipijigi.sdate)
+                        {articleCategorySwitch(article.category)}
+                      </TableData>
+                      <TableData>{article.status}</TableData>
+                      <TableData>
+                        {moment(article.sdate)
                           .utcOffset(9)
                           .format('YY.MM.DD HH:mm')}
                       </TableData>
                       <TableData>
-                        {moment(jipijigi.cdate)
+                        {moment(article.cdate)
                           .utcOffset(9)
                           .format('YY.MM.DD HH:mm')}
                       </TableData>

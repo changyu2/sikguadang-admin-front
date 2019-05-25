@@ -1,8 +1,15 @@
 import request from '../utils/request';
 
-export const login = (email, password) => {
+export const me = () => {
+  return request({
+    url: `/v1/authors/me`,
+    method: 'GET'
+  });
+};
+
+export const login = (authorId, password) => {
   let data = {
-    email,
+    authorId,
     password
   };
 
@@ -37,6 +44,22 @@ export const editNotice = (noticeId, data) => {
   });
 };
 
+export const getInquiriesList = (offset, limit) => {
+  return request({
+    url: `/v1/inquiries?offset=${offset}&limit=${limit}`,
+    method: 'GET',
+    data: {}
+  });
+};
+
+export const editInquiry = (inquiryId, data) => {
+  return request({
+    url: `/v1/inquiries/${inquiryId}`,
+    method: 'PUT',
+    data: data
+  });
+};
+
 export const getStoreItemList = (offset, limit) => {
   return request({
     url: `/v1/stores?offset=${offset}&limit=${limit}`,
@@ -61,25 +84,25 @@ export const editStoreItem = (storeItemId, data) => {
   });
 };
 
-export const getJipijigiList = (offset, limit) => {
+export const getArticleList = (offset, limit) => {
   return request({
-    url: `/v1/jipijigi?offset=${offset}&limit=${limit}`,
+    url: `/v1/articles?offset=${offset}&limit=${limit}`,
     method: 'GET',
     data: {}
   });
 };
 
-export const postJipijigi = data => {
+export const postArticle = data => {
   return request({
-    url: '/v1/jipijigi',
+    url: '/v1/articles',
     method: 'POST',
     data: data
   });
 };
 
-export const editJipijigi = (jipijigiId, data) => {
+export const editArticle = (jipijigiId, data) => {
   return request({
-    url: `/v1/jipijigi/${jipijigiId}`,
+    url: `/v1/articles/${jipijigiId}`,
     method: 'PUT',
     data: data
   });

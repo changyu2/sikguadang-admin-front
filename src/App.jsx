@@ -3,7 +3,13 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import { Sidebar } from './components';
-import { Login, NoticesTool, StoresTool, JipijigiTool } from './containers';
+import {
+  Login,
+  NoticesTool,
+  InquiriesTool,
+  StoresTool,
+  ArticlesTool
+} from './containers';
 
 class App extends Component {
   componentDidMount() {
@@ -38,14 +44,19 @@ class App extends Component {
               component={() => <NoticesTool toggleMenu={this.openMenu} />}
             />
             <Route
+              path="/inquiries"
+              exact
+              component={() => <InquiriesTool toggleMenu={this.openMenu} />}
+            />
+            <Route
               path="/stores"
               exact
               component={() => <StoresTool toggleMenu={this.openMenu} />}
             />
             <Route
-              path="/jipijigi"
+              path="/articles"
               exact
-              component={() => <JipijigiTool toggleMenu={this.openMenu} />}
+              component={() => <ArticlesTool toggleMenu={this.openMenu} />}
             />
           </>
         </Router>

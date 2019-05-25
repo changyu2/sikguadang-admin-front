@@ -16,88 +16,87 @@ import {
   Button,
   DialogItem
 } from '../components';
-import {
-  getJipijigiList,
-  postJipijigi,
-  editJipijigi
-} from '../actions/jipijigi';
+import { getArticleList, postArticle, editArticle } from '../actions/articles';
 import { postTempImages } from '../actions/images';
 import config from '../utils/config';
 
-const initialJipijigi = {
-  jipijigiId: '',
+const initialArticle = {
+  articleId: '',
   title: '',
-  description: '',
   thumbnailUrl: [],
+  bannerUrl: [],
   imageUrl: [],
-  category: '',
+  hashTag: '',
+  source: '',
+  sourceLink: '',
+  category: null,
   status: '',
   sdate: null,
   cdate: null
 };
 
-const JipijigiTool = props => {
+const ArticlesTool = props => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [jipijigiId, setJipijigiId] = useState('');
-  const [jipijigi, setJipijigi] = useState({ ...initialJipijigi });
+  const [articleId, setArticleId] = useState('');
+  const [article, setArticle] = useState({ ...initialArticle });
   const [page, setPage] = useState(0);
 
-  const sdate = jipijigi.sdate
-    ? moment(jipijigi.sdate)
+  const sdate = article.sdate
+    ? moment(article.sdate)
         .utcOffset(9)
         .toDate()
     : null;
 
   useEffect(() => {
-    props.getJipijigiList();
+    props.getArticleList();
   }, []);
 
-  const handleOpenNewJipijigi = () => {
+  const handleOpenNewArticle = () => {
     setModalVisible(true);
-    setJipijigi({ ...initialJipijigi });
+    setArticle({ ...initialArticle });
   };
 
-  const handleOpenJipijigi = jipijiId => {
-    if (jipijiId) {
-      let jipijigi = props.jipijigiList.filter(
-        jipijigi => jipijigi.jipijigiId === jipijigiId
+  const handleOpenArticle = articleId => {
+    if (articleId) {
+      let article = props.articleList.filter(
+        article => article.articleId === articleId
       )[0];
       setModalVisible(true);
-      setJipijigi(jipijigi);
-      setJipijigiId(jipijiId);
+      setArticle(article);
+      setArticleId(articleId);
     } else {
       setModalVisible(true);
     }
   };
 
   const handleDeleteThumbnailImage = index => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         thumbnailUrl: { $splice: [[index, 1]] }
       })
     );
   };
 
+  const handleDeleteBannerImage = index => {
+    setArticle(
+      update(article, {
+        bannerUrl: { $splice: [[index, 1]] }
+      })
+    );
+  };
+
   const handleDeleteCard = index => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         imageUrl: { $splice: [[index, 1]] }
       })
     );
   };
 
   const handleChangeTitle = e => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         title: { $set: e.target.value }
-      })
-    );
-  };
-
-  const handleChangeDescription = e => {
-    setJipijigi(
-      update(jipijigi, {
-        description: { $set: e.target.value }
       })
     );
   };
@@ -153,9 +152,76 @@ const JipijigiTool = props => {
                 newCard.localImageUrl = files[i].preview;
                 newCardArray.push(newCard);
               }
-              setJipijigi(
-                update(jipijigi, {
+              setArticle(
+                update(article, {
                   thumbnailUrl: { $push: newCardArray }
+                })
+              );
+            }
+          })
+          .catch(err => {
+            alert('10MB 이하의 이미지를 업로드 해주세요.');
+          });
+      });
+    } else {
+      alert('이미지를 업로드 해주세요.');
+    }
+  };
+
+  const handleDropImagesToBannerUrl = (files, type) => {
+    if (files.length > 0) {
+      files.sort(function(a, b) {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+      });
+      const imageSizePromiseArray = [];
+      const data = new FormData();
+
+      files.forEach(file => {
+        const imageSizePromise = new Promise((resolve, reject) => {
+          const image = new Image();
+          image.src = file.preview;
+          image.onload = function() {
+            if (this.width === this.height && this.width <= 1920) {
+              return resolve();
+            } else if (this.width > this.height && this.width <= 1920) {
+              return resolve();
+            } else if (this.width < this.height && this.width <= 1920) {
+              return resolve();
+            } else {
+              const err = new Error(
+                file.name +
+                  '\n이미지의 해상도는 작은 각이 1920 픽셀 이하로 준비해주세요.'
+              );
+              alert(
+                '이미지의 해상도는 작은 각이 1920 픽셀 이하로 준비해주세요.'
+              );
+              return reject(err);
+            }
+          };
+        });
+        imageSizePromiseArray.push(imageSizePromise);
+        data.append('images', file);
+      });
+      return new Promise.all(imageSizePromiseArray).then(() => {
+        props
+          .postTempImages(data)
+          .then(response => {
+            const tempKeyArray = response.value.data;
+            if (tempKeyArray.length !== files.length) {
+              alert(
+                'Number of temp images returned, and uploaded are different'
+              );
+            } else {
+              const newCardArray = [];
+              for (let i in tempKeyArray) {
+                const newCard = {};
+                newCard.imageUrl = tempKeyArray[i];
+                newCard.localImageUrl = files[i].preview;
+                newCardArray.push(newCard);
+              }
+              setArticle(
+                update(article, {
+                  bannerUrl: { $push: newCardArray }
                 })
               );
             }
@@ -220,8 +286,8 @@ const JipijigiTool = props => {
                 newCard.localImageUrl = files[i].preview;
                 newCardArray.push(newCard);
               }
-              setJipijigi(
-                update(jipijigi, {
+              setArticle(
+                update(article, {
                   imageUrl: { $push: newCardArray }
                 })
               );
@@ -236,24 +302,48 @@ const JipijigiTool = props => {
     }
   };
 
+  const handleChangeHashTag = e => {
+    setArticle(
+      update(article, {
+        hashTag: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeSource = e => {
+    setArticle(
+      update(article, {
+        source: { $set: e.target.value }
+      })
+    );
+  };
+
+  const handleChangeSourceLink = e => {
+    setArticle(
+      update(article, {
+        sourceLink: { $set: e.target.value }
+      })
+    );
+  };
+
   const handleChangeCategory = (e, index, value) => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         category: { $set: value }
       })
     );
   };
 
   const handleChangeStatus = (e, index, value) => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         status: { $set: value }
       })
     );
   };
 
   const handleChangeScheduleDate = (waste, scheduledDate) => {
-    let oldDate = jipijigi.sdate;
+    let oldDate = article.sdate;
     if (oldDate) {
       let hours = moment(oldDate).hours();
       let minutes = moment(oldDate).minutes();
@@ -261,15 +351,15 @@ const JipijigiTool = props => {
         .hours(hours)
         .minutes(minutes);
     }
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         sdate: { $set: scheduledDate }
       })
     );
   };
 
   const handleChangeScheduleTime = (waste, scheduledDate) => {
-    let oldDate = jipijigi.sdate;
+    let oldDate = article.sdate;
     if (oldDate) {
       let hours = moment(scheduledDate).hours();
       let minutes = moment(scheduledDate).minutes();
@@ -277,8 +367,8 @@ const JipijigiTool = props => {
         .hours(hours)
         .minutes(minutes);
     }
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         sdate: { $set: scheduledDate }
       })
     );
@@ -286,39 +376,64 @@ const JipijigiTool = props => {
 
   const handleOk = () => {
     const data = {};
-    data.jipijigi = jipijigi;
+    data.article = article;
 
-    if (!jipijigi.title) {
+    if (!article.title) {
       alert('제목을 입력해주세요.');
       return false;
     }
 
-    if (jipijigi.thumbnailUrl.length === 0) {
+    if (article.thumbnailUrl.length === 0) {
       alert('썸네일 이미지를 업로드해주세요.');
       return false;
     }
 
-    if (!jipijigi.category) {
+    if (article.bannerUrl.length === 0) {
+      alert('배너 이미지를 업로드해주세요.');
+      return false;
+    }
+
+    if (article.imageUrl.length === 0) {
+      alert('내용 이미지를 업로드해주세요.');
+      return false;
+    }
+
+    if (!article.hashTag) {
+      alert('해쉬태그를 입력해주세요.');
+      return false;
+    }
+
+    if (!article.source) {
+      alert('출처를 입력해주세요.');
+      return false;
+    }
+
+    if (!article.sourceLink) {
+      alert('출처 링크를 입력해주세요.');
+      return false;
+    }
+
+    if (!article.category) {
       alert('카테고리를 선택해주세요.');
       return false;
     }
 
-    if (!jipijigi.status) {
+    if (!article.status) {
       alert('상태를 선택해주세요.');
       return false;
     }
 
-    if (!jipijigi.sdate) {
+    if (!article.sdate) {
       alert('스케쥴 날짜를 선택해주세요.');
       return false;
     }
 
     if (true) {
       return new Promise((resolve, reject) => {
-        if (jipijigiId) {
-          return resolve(props.editJipijigi(jipijigiId, data));
+        if (articleId) {
+          return resolve(props.editArticle(articleId, data));
         } else {
-          return resolve(props.postJipijigi(data));
+          return resolve(props.postArticle(data));
         }
       })
         .then(response => {
@@ -336,8 +451,8 @@ const JipijigiTool = props => {
     const check = confirm('작성을 취소하시겠어요?');
     if (check) {
       setModalVisible(false);
-      setJipijigi({ ...initialJipijigi });
-      setJipijigiId('');
+      setArticle({ ...initialArticle });
+      setArticleId('');
     }
   };
 
@@ -354,20 +469,30 @@ const JipijigiTool = props => {
   };
 
   const onSortEndForThumbnailUrl = ({ oldIndex, newIndex }) => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         thumbnailUrl: {
-          $set: arrayMove(jipijigi.thumbnailUrl, oldIndex, newIndex)
+          $set: arrayMove(article.thumbnailUrl, oldIndex, newIndex)
+        }
+      })
+    );
+  };
+
+  const onSortEndForBannerUrl = ({ oldIndex, newIndex }) => {
+    setArticle(
+      update(article, {
+        bannerUrl: {
+          $set: arrayMove(article.bannerUrl, oldIndex, newIndex)
         }
       })
     );
   };
 
   const onSortEndForImageUrl = ({ oldIndex, newIndex }) => {
-    setJipijigi(
-      update(jipijigi, {
+    setArticle(
+      update(article, {
         imageUrl: {
-          $set: arrayMove(jipijigi.imageUrl, oldIndex, newIndex)
+          $set: arrayMove(article.imageUrl, oldIndex, newIndex)
         }
       })
     );
@@ -380,15 +505,15 @@ const JipijigiTool = props => {
         <Grid style={{ width: '100%', padding: '0px' }}>
           <Row>
             <Col xs={12}>
-              <Button onClick={handleOpenNewJipijigi}>New Article</Button>
+              <Button onClick={handleOpenNewArticle}>New Article</Button>
             </Col>
           </Row>
           <Row style={{ margin: '20px 0px' }}>
             <Col xs={12} style={{ padding: '0px' }}>
               <ContentList
-                contentName="Jipijigi"
-                jipijigiList={props.jipijigiList}
-                openJipijigi={handleOpenJipijigi}
+                contentName="Article"
+                articleList={props.articleList}
+                openArticle={handleOpenArticle}
               />
             </Col>
           </Row>
@@ -413,15 +538,21 @@ const JipijigiTool = props => {
         ]}
       >
         <DialogItem
-          dialogName="Jipijigi"
-          jipijigi={jipijigi}
+          dialogName="Article"
+          article={article}
           changeTitle={handleChangeTitle}
-          changeDescription={handleChangeDescription}
           dropImagesToThumbnail={handleDropImagesToThumbnail}
           onSortEndForThumbnailUrl={onSortEndForThumbnailUrl}
           deleteThumbnailImage={handleDeleteThumbnailImage}
+          dropImagesToBannerUrl={handleDropImagesToBannerUrl}
+          onSortEndForBannerUrl={onSortEndForBannerUrl}
+          deleteBannerUrl={handleDeleteBannerImage}
           dropImagesToImageUrl={handleDropImagesToImageUrl}
           onSortEndForImageUrl={onSortEndForImageUrl}
+          deleteImageUrl={handleDeleteCard}
+          changeHashTag={handleChangeHashTag}
+          changeSource={handleChangeSource}
+          changeSourceLink={handleChangeSourceLink}
           changeCategory={handleChangeCategory}
           changeStatus={handleChangeStatus}
           sdate={sdate}
@@ -435,22 +566,22 @@ const JipijigiTool = props => {
 
 const mapStateToProps = state => {
   return {
-    jipijigiList: state.jipijigi.jipijigiList,
-    getJipijigiListStatus: state.jipijigi.jipijigiList,
+    articleList: state.articles.articleList,
+    getArticleListStatus: state.articles.articleList,
     postTempImagesStatus: state.images.postTempImages
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    getJipijigiList: (offset, limit) => {
-      return dispatch(getJipijigiList(offset, limit));
+    getArticleList: (offset, limit) => {
+      return dispatch(getArticleList(offset, limit));
     },
-    postJipijigi: data => {
-      return dispatch(postJipijigi(data));
+    postArticle: data => {
+      return dispatch(postArticle(data));
     },
-    editJipijigi: (jipijigiId, data) => {
-      return dispatch(editJipijigi(jipijigiId, data));
+    editArticle: (articleId, data) => {
+      return dispatch(editArticle(articleId, data));
     },
     postTempImages: data => {
       return dispatch(postTempImages(data));
@@ -462,5 +593,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(JipijigiTool)
+  )(ArticlesTool)
 );

@@ -77,7 +77,7 @@ const DialogItem = props => {
               />
               <Row>
                 <Dropzone
-                  onDrop={files => props.dropImagesToImageUrl(files)}
+                  onDrop={files => props.dropImagesToImageCards(files)}
                   style={styles.cardSlideContainer}
                   accept="image/*"
                   disableClick={true}
@@ -86,14 +86,14 @@ const DialogItem = props => {
                   <Row>
                     <SortableList
                       axis={'xy'}
-                      cards={props.notice.imageUrl}
-                      onSortEnd={props.onSortEndForImageUrl}
-                      handleDeleteCard={props.deleteCard}
+                      cards={props.notice.imageCards}
+                      onSortEnd={props.onSortEndForImageCards}
+                      handleDeleteCard={props.deleteImageCards}
                       useDragHandle={false}
                     />
                     <Col xs={4}>
                       <Dropzone
-                        onDrop={files => props.dropImagesToImageUrl(files)}
+                        onDrop={files => props.dropImagesToImageCards(files)}
                         accept="image/*"
                         style={{ border: 'none' }}
                       >
@@ -135,6 +135,44 @@ const DialogItem = props => {
                 hintText="TIME"
                 value={props.sdate}
                 onChange={props.changeScheduleTime}
+                style={styles.dateAndTimePicker}
+                textFieldStyle={styles.col}
+              />
+            </Col>
+          </Row>
+        );
+      case 'Inquiry':
+        return (
+          <Row>
+            <Col xs={12}>
+              <TextField
+                disabled
+                floatingLabelText="제목"
+                floatingLabelFixed={true}
+                defaultValue={props.inquiry.title}
+                style={styles.col}
+              />
+              <TextField
+                floatingLabelText="내용"
+                floatingLabelFixed={true}
+                defaultValue={props.inquiry.answer.text}
+                onChange={props.changeText}
+                multiLine={true}
+                style={styles.col}
+              />
+              <DatePicker
+                floatingLabelText="답변 날짜"
+                hintText="DATE"
+                value={props.answerDate}
+                onChange={props.changeAnswerDate}
+                style={styles.dateAndTimePicker}
+                textFieldStyle={styles.col}
+              />
+              <TimePicker
+                floatingLabelText="답변 시간"
+                hintText="TIME"
+                value={props.answerDate}
+                onChange={props.changeAnswerTime}
                 style={styles.dateAndTimePicker}
                 textFieldStyle={styles.col}
               />
@@ -273,15 +311,29 @@ const DialogItem = props => {
                 onChange={props.changeOptionItem4Price}
                 style={styles.col}
               />
+              <TextField
+                floatingLabelText="중량"
+                floatingLabelFixed={true}
+                defaultValue={props.storeItem.weight}
+                onChange={props.changeWeight}
+                style={styles.col}
+              />
+              <TextField
+                floatingLabelText="유통기한"
+                floatingLabelFixed={true}
+                defaultValue={props.storeItem.expirationDate}
+                onChange={props.changeExpirationDate}
+                style={styles.col}
+              />
               <SelectField
                 floatingLabelText="카테고리"
                 value={props.storeItem.category}
                 onChange={props.changeCategory}
                 style={styles.col}
               >
-                <MenuItem value={1} primaryText="체험식" />
-                <MenuItem value={2} primaryText="반찬" />
-                <MenuItem value={3} primaryText="간식" />
+                <MenuItem value={1} primaryText="반찬" />
+                <MenuItem value={2} primaryText="간식" />
+                <MenuItem value={3} primaryText="영양제" />
               </SelectField>
               <SelectField
                 floatingLabelText="품절 여부"
@@ -384,25 +436,58 @@ const DialogItem = props => {
                   </Row>
                 </Dropzone>
               </Row>
+              <Row>
+                <Dropzone
+                  onDrop={files => props.dropImagesToProductInfoCards(files)}
+                  style={styles.cardSlideContainer}
+                  accept="image/*"
+                  disableClick={true}
+                >
+                  <div>제품정보고시 이미지</div>
+                  <Row>
+                    <SortableList
+                      axis={'xy'}
+                      cards={props.storeItem.productInfoCards}
+                      onSortEnd={props.onSortEndForProductInfoCards}
+                      handleDeleteCard={props.deleteProductInfoCard}
+                      useDragHandle={false}
+                    />
+                    <Col xs={4}>
+                      <Dropzone
+                        onDrop={files =>
+                          props.dropImagesToProductInfoCards(files)
+                        }
+                        accept="image/*"
+                        style={{ border: 'none' }}
+                      >
+                        <Paper style={styles.card}>
+                          <div
+                            style={{
+                              height: 150,
+                              textAlign: 'center',
+                              transform: 'translateY(40%)'
+                            }}
+                          >
+                            이미지 추가
+                          </div>
+                        </Paper>
+                      </Dropzone>
+                    </Col>
+                  </Row>
+                </Dropzone>
+              </Row>
             </Col>
           </Row>
         );
-      case 'Jipijigi':
+      case 'Article':
         return (
           <Row>
             <Col xs={12}>
               <TextField
                 floatingLabelText="제목"
                 floatingLabelFixed={true}
-                defaultValue={props.jipijigi.title}
+                defaultValue={props.article.title}
                 onChange={props.changeTitle}
-                style={styles.col}
-              />
-              <TextField
-                floatingLabelText="부제목"
-                floatingLabelFixed={true}
-                defaultValue={props.jipijigi.description}
-                onChange={props.changeDescription}
                 style={styles.col}
               />
               <Row style={{ marginBottom: '40px' }}>
@@ -416,7 +501,7 @@ const DialogItem = props => {
                   <Row>
                     <SortableList
                       axis={'xy'}
-                      cards={props.jipijigi.thumbnailUrl}
+                      cards={props.article.thumbnailUrl}
                       onSortEnd={props.onSortEndForThumbnailUrl}
                       handleDeleteCard={props.deleteThumbnailImage}
                       useDragHandle={false}
@@ -424,6 +509,44 @@ const DialogItem = props => {
                     <Col xs={4}>
                       <Dropzone
                         onDrop={files => props.dropImagesToThumbnail(files)}
+                        accept="image/*"
+                        style={{ border: 'none' }}
+                      >
+                        <Paper style={styles.card}>
+                          <div
+                            style={{
+                              height: 150,
+                              textAlign: 'center',
+                              transform: 'translateY(40%)'
+                            }}
+                          >
+                            이미지 추가
+                          </div>
+                        </Paper>
+                      </Dropzone>
+                    </Col>
+                  </Row>
+                </Dropzone>
+              </Row>
+              <Row style={{ marginBottom: '40px' }}>
+                <Dropzone
+                  onDrop={files => props.dropImagesToBannerUrl(files)}
+                  style={styles.cardSlideContainer}
+                  accept="image/*"
+                  disableClick={true}
+                >
+                  <div>지피지기 당뇨 배너 이미지</div>
+                  <Row>
+                    <SortableList
+                      axis={'xy'}
+                      cards={props.article.bannerUrl}
+                      onSortEnd={props.onSortEndForBannerUrl}
+                      handleDeleteCard={props.deleteBannerUrl}
+                      useDragHandle={false}
+                    />
+                    <Col xs={4}>
+                      <Dropzone
+                        onDrop={files => props.dropImagesToBannerUrl(files)}
                         accept="image/*"
                         style={{ border: 'none' }}
                       >
@@ -454,9 +577,9 @@ const DialogItem = props => {
                   <Row>
                     <SortableList
                       axis={'xy'}
-                      cards={props.jipijigi.imageUrl}
+                      cards={props.article.imageUrl}
                       onSortEnd={props.onSortEndForImageUrl}
-                      handleDeleteCard={props.deleteCard}
+                      handleDeleteCard={props.deleteImageUrl}
                       useDragHandle={false}
                     />
                     <Col xs={4}>
@@ -481,19 +604,40 @@ const DialogItem = props => {
                   </Row>
                 </Dropzone>
               </Row>
+              <TextField
+                floatingLabelText="해쉬태그"
+                floatingLabelFixed={true}
+                defaultValue={props.article.hashTag}
+                onChange={props.changeHashTag}
+                style={styles.col}
+              />
+              <TextField
+                floatingLabelText="출처"
+                floatingLabelFixed={true}
+                defaultValue={props.article.source}
+                onChange={props.changeSource}
+                style={styles.col}
+              />
+              <TextField
+                floatingLabelText="출처 링크"
+                floatingLabelFixed={true}
+                defaultValue={props.article.sourceLink}
+                onChange={props.changeSourceLink}
+                style={styles.col}
+              />
               <SelectField
                 floatingLabelText="카테고리"
-                value={props.jipijigi.category}
+                value={props.article.category}
                 onChange={props.changeCategory}
                 style={styles.col}
               >
-                <MenuItem value={'about'} primaryText="당뇨란?" />
-                <MenuItem value={'food'} primaryText="당뇨 음식" />
-                <MenuItem value={'exercise'} primaryText="당뇨 운동" />
+                <MenuItem value={1} primaryText="당뇨란?" />
+                <MenuItem value={2} primaryText="당뇨 음식" />
+                <MenuItem value={3} primaryText="당뇨 운동" />
               </SelectField>
               <SelectField
                 floatingLabelText="상태"
-                value={props.jipijigi.status}
+                value={props.article.status}
                 onChange={props.changeStatus}
                 style={styles.col}
               >
