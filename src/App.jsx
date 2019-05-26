@@ -7,6 +7,7 @@ import {
   Login,
   NoticesTool,
   InquiriesTool,
+  OrdersTool,
   StoresTool,
   ArticlesTool
 } from './containers';
@@ -47,6 +48,11 @@ class App extends Component {
               path="/inquiries"
               exact
               component={() => <InquiriesTool toggleMenu={this.openMenu} />}
+            />
+            <Route
+              path="/orders"
+              exact
+              component={() => <OrdersTool toggleMenu={this.openMenu} />}
             />
             <Route
               path="/stores"

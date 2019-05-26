@@ -179,6 +179,27 @@ const DialogItem = props => {
             </Col>
           </Row>
         );
+      case 'Order':
+        return (
+          <Row>
+            <Col xs={12}>
+              <TextField
+                disabled
+                floatingLabelText="상품명"
+                floatingLabelFixed={true}
+                defaultValue={props.order.productName}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="옵션"
+                floatingLabelFixed={true}
+                defaultValue={props.order.optionItemName}
+                style={styles.col}
+              />
+            </Col>
+          </Row>
+        );
       case 'Store':
         return (
           <Row>

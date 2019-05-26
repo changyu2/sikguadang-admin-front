@@ -60,6 +60,22 @@ export const editInquiry = (inquiryId, data) => {
   });
 };
 
+export const getOrdersList = (offset, limit) => {
+  return request({
+    url: `/v1/orders?offset=${offset}&limit=${limit}`,
+    method: 'GET',
+    data: {}
+  });
+};
+
+export const editOrder = (orderId, data) => {
+  return request({
+    url: `/v1/orders/${orderId}`,
+    method: 'PUT',
+    data: data
+  });
+};
+
 export const getStoreItemList = (offset, limit) => {
   return request({
     url: `/v1/stores?offset=${offset}&limit=${limit}`,

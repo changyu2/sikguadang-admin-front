@@ -159,7 +159,51 @@ const ContentList = props => {
               </Table>
             ) : (
               <Cover>
-                <h2>공지사항이 없습니다.</h2>
+                <h2>1:1문의 게시물이 없습니다.</h2>
+              </Cover>
+            )}
+          </>
+        );
+      case 'Order':
+        return (
+          <>
+            {props.orderList.length ? (
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>
+                      <h2>상품명</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>옵션</h2>
+                    </TableHeader>
+                    <TableHeader>
+                      <h2>주문날짜</h2>
+                    </TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.orderList.map((order, index) => (
+                    <tr
+                      key={order.orderId}
+                      onClick={() => {
+                        props.openOrder(order.orderId);
+                      }}
+                    >
+                      <TableData>{order.productName}</TableData>
+                      <TableData>{order.optionItemName}</TableData>
+                      <TableData>
+                        {moment(order.cdate)
+                          .utcOffset(9)
+                          .format('YY.MM.DD HH:mm')}
+                      </TableData>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <Cover>
+                <h2>주문내역이 없습니다.</h2>
               </Cover>
             )}
           </>
