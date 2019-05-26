@@ -70,6 +70,7 @@ class Sidebar extends Component {
         >
           <StyledLink to="/notices">공지사항 관리</StyledLink>
           <StyledLink to="/inquiries">1:1문의 답변 관리</StyledLink>
+          <StyledLink to="/orders">주문내역 관리</StyledLink>
           <StyledLink to="/stores">건강당 마켓 관리</StyledLink>
           <StyledLink to="/articles">지피지기 당뇨 관리</StyledLink>
           <Logout onClick={this.goHome}>LOGOUT</Logout>
