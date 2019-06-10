@@ -30,6 +30,17 @@ const Cover = styled.div`
 `;
 
 const ContentList = props => {
+  function orderStatusSwitch(orderStatus) {
+    switch (orderStatus) {
+      case 'ready':
+        return '입금 대기중';
+      case 'paid':
+        return '결제 완료';
+      default:
+        return null;
+    }
+  }
+
   function storeCategorySwitch(categoryNumber) {
     switch (categoryNumber) {
       case 1:
@@ -180,6 +191,9 @@ const ContentList = props => {
                     <TableHeader>
                       <h2>주문날짜</h2>
                     </TableHeader>
+                    <TableHeader>
+                      <h2>상태</h2>
+                    </TableHeader>
                   </tr>
                 </thead>
                 <tbody>
@@ -197,6 +211,7 @@ const ContentList = props => {
                           .utcOffset(9)
                           .format('YY.MM.DD HH:mm')}
                       </TableData>
+                      <TableData>{orderStatusSwitch(order.status)}</TableData>
                     </tr>
                   ))}
                 </tbody>

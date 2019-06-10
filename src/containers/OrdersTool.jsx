@@ -106,7 +106,7 @@ const OrdersTool = props => {
 
 const mapStateToProps = state => {
   return {
-    orderList: state.orders.orderList,
+    orderList: state.orders.orderList.filter(data => data.status !== 'failed'),
     getOrderListStatus: state.orders.orderList
   };
 };

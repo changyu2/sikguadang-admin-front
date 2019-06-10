@@ -54,6 +54,17 @@ const SortableList = SortableContainer(({ cards, handleDeleteCard }) => {
 });
 
 const DialogItem = props => {
+  function orderStatusSwitch(orderStatus) {
+    switch (orderStatus) {
+      case 'ready':
+        return '입금 대기중';
+      case 'paid':
+        return '결제 완료';
+      default:
+        return null;
+    }
+  }
+
   function renderSwitch(dialogName) {
     switch (dialogName) {
       case 'Notice':
@@ -195,6 +206,57 @@ const DialogItem = props => {
                 floatingLabelText="옵션"
                 floatingLabelFixed={true}
                 defaultValue={props.order.optionItemName}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="주문자 아이디"
+                floatingLabelFixed={true}
+                defaultValue={props.order.userId}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="주문자 이름"
+                floatingLabelFixed={true}
+                defaultValue={props.order.userName}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="받으시는 분"
+                floatingLabelFixed={true}
+                defaultValue={props.order.recipientName}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="우편번호"
+                floatingLabelFixed={true}
+                defaultValue={props.order.postcode}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="주소"
+                floatingLabelFixed={true}
+                defaultValue={`${props.order.address} ${
+                  props.order.addressDetail
+                }`}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="연락처"
+                floatingLabelFixed={true}
+                defaultValue={`${props.order.recipientPhoneNumber}`}
+                style={styles.col}
+              />
+              <TextField
+                disabled
+                floatingLabelText="상태"
+                floatingLabelFixed={true}
+                defaultValue={orderStatusSwitch(props.order.status)}
                 style={styles.col}
               />
             </Col>
